@@ -106,6 +106,11 @@ CONTRACT.md 前后端接口契约
 ## 依赖与素材授权
 
 - 运行环境：Node 22+（Mac）、Android 8+（电视）。
-- 右侧高清鲸鱼娘动画来自 [QCYTSN/dsh-dafeiyu](https://github.com/QCYTSN/dsh-dafeiyu)（MIT），上游 [PC2005-cloud/dsh-pet](https://github.com/PC2005-cloud/dsh-pet)（MIT）；工位像素小鲸娘来自 [ccch1mneyyy/dsh-go](https://github.com/ccch1mneyyy/dsh-go)。
+- 右侧高清鲸鱼娘动画来自 [QCYTSN/dsh-dafeiyu](https://github.com/QCYTSN/dsh-dafeiyu)（MIT），上游 [PC2005-cloud/dsh-pet](https://github.com/PC2005-cloud/dsh-pet)（MIT）。
+- 工位像素小鲸娘：基于 [ccch1mneyyy/dsh-go](https://github.com/ccch1mneyyy/dsh-go) 的像素鲸娘（whale-girl）素材做了姿态扩展。
+  ⚠️ **该素材版权归 DSH-TUI 作者所有（保留所有权利），本项目已发起授权申请，等待回复：**
+  [ccch1mneyyy/dsh-Go#886](https://github.com/ccch1mneyyy/dsh-Go/issues/886)。
+  在获得作者许可前：**请勿商用、请勿二次分发/再发布**；如果作者不同意，会替换成自绘的原创像素小人。
+- 项目为个人/家庭自用、非商用、非官方，与 DeepSeek 无关联。
 - 其余美术均为程序化 Canvas 绘制，无外部资源、无网络字体。
 - 灵感：[harishkotra/agent-office](https://github.com/harishkotra/agent-office)、[Thunderunruly/agent-office](https://github.com/Thunderunruly/agent-office)、[thuyqpham/dsh-tv](https://github.com/thuyqpham/dsh-tv)（借鉴宿主机 ASR 思路）。
