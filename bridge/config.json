@@ -1,0 +1,42 @@
+{
+  "port": 8765,
+  "discoveryPort": 8766,
+  "host": "0.0.0.0",
+  "stateCacheMs": 1000,
+  "maxSessions": 24,
+  "maxSessionsPerWorkspace": 6,
+  "recentHours": 24,
+  "projcacheDir": "~/.dsh/storages/session_projcache/sessions",
+  "petDir": "~/.dsh/profiles/desktop/node_modules/dsh-dafeiyu/assets/pet",
+  "webDir": "web",
+  "apiKeyEnv": "DEEPSEEK_API_KEY",
+  "exposedClips": [
+    "idle",
+    "idle_yawn",
+    "idle_stretch",
+    "thinking",
+    "working",
+    "working_command",
+    "working_search",
+    "waiting",
+    "success",
+    "error",
+    "poke",
+    "head_pat",
+    "tail"
+  ],
+  "llm": {
+    "baseUrl": "https://api.deepseek.com",
+    "model": "deepseek-chat",
+    "timeoutMs": 8000,
+    "maxTokens": 260
+  },
+  "tts": {
+    "enabled": true,
+    "voice": "zh-CN-XiaoyiNeural",
+    "bin": "~/.dsh-office-tts/venv/bin/edge-tts",
+    "cacheDir": "~/.dsh-office-tts/cache",
+    "timeoutMs": 12000,
+    "maxChars": 200
+  }
+}

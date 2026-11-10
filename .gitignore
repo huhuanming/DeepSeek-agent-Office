@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+
+# Python / venv（TTS 引擎装在 ~/.dsh-office-tts，不在仓库内）
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Gradle / Android 构建产物
+tv-app/.gradle/
+tv-app/build/
+tv-app/app/build/
+tv-app/local.properties
+tv-app/.idea/
+*.iml
+*.hprof
+
+# bridge 运行缓存
+bridge/.cache/
+
+# 日志 / 临时文件
+*.log
+*.tmp
+tv-app/debug.keystore

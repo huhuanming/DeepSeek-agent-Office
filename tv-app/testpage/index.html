@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DSH TV 按键测试页</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #0b1020; color: #e8eefc;
+    font-family: -apple-system, "PingFang SC", "Noto Sans CJK SC", sans-serif; overflow: hidden; }
+  #wrap { padding: 32px 48px; }
+  h1 { font-size: 40px; margin: 0 0 8px; }
+  .hint { color: #7f8fb0; font-size: 22px; margin-bottom: 20px; }
+  #big { font-size: 64px; font-weight: 700; padding: 20px 0; color: #7dd3fc; min-height: 84px; }
+  #log { font-size: 22px; line-height: 1.6; color: #a9b8d8; white-space: pre-wrap; }
+  #pane { position: fixed; inset: 0; display: none; background: rgba(8, 12, 28, .94);
+    align-items: center; justify-content: center; flex-direction: column; }
+  #pane.open { display: flex; }
+  #pane h2 { font-size: 56px; color: #fde68a; }
+  #pane p { font-size: 26px; color: #9fb0d0; }
+  #speak { font-size: 24px; color: #86efac; margin-top: 12px; min-height: 30px; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <h1>DSH 办公室 TV · 按键链路测试</h1>
+  <div class="hint">短按 OK = 戳一下（ok） · 长按 OK ≥600ms = 开面板（long_ok） · BACK = 关闭面板（back）</div>
+  <div id="big">等待按键…</div>
+  <div id="log"></div>
+  <div id="speak"></div>
+</div>
+<div id="pane">
+  <h2>🐳 和鲸鱼娘聊聊（面板已打开）</h2>
+  <p>再按一次 BACK 应关闭面板而不是退出 App</p>
+  <p id="paneHint">TTS 测试台词正在朗读…</p>
+</div>
+<script>
+(function () {
+  var big = document.getElementById('big');
+  var logEl = document.getElementById('log');
+  var pane = document.getElementById('pane');
+  var paneHint = document.getElementById('paneHint');
+  var speakEl = document.getElementById('speak');
+  var counts = { ok: 0, long_ok: 0, back: 0, up: 0, down: 0, left: 0, right: 0, menu: 0 };
+  var panelOpen = false;
+
+  function nativeLog(msg) {
+    try { if (window.DshTvNative && DshTvNative.log) DshTvNative.log(msg); } catch (e) {}
+    console.log('[testpage] ' + msg);
+  }
+  function speak(text) {
+    speakEl.textContent = '🔊 TTS: ' + text;
+    try { if (window.DshTvNative && DshTvNative.speak) DshTvNative.speak(text); } catch (e) {}
+    nativeLog('speak requested: ' + text);
+  }
+  function render(action) {
+    big.textContent = action + '   (' + counts[action] + ')';
+    var lines = [];
+    for (var k in counts) lines.push(k + '=' + counts[k]);
+    logEl.textContent = lines.join('   ');
+    document.title = 'keys ' + JSON.stringify(counts);
+  }
+  function record(action) {
+    if (!(action in counts)) counts[action] = 0;
+    counts[action]++;
+    render(action);
+    nativeLog('onKey: ' + action);
+  }
+
+  window.DshTv = {
+    onKey: function (action) {
+      record(action);
+      if (action === 'long_ok') {
+        panelOpen = true;
+        pane.classList.add('open');
+        speak('你好呀，我是鲸鱼娘。');
+      } else if (action === 'back') {
+        if (panelOpen) {
+          panelOpen = false;
+          pane.classList.remove('open');
+        } else {
+          paneHint.textContent = '面板已经关闭；BACK 不会退出 App。';
+        }
+      } else if (action === 'ok') {
+        if (panelOpen) { paneHint.textContent = '戳到鲸鱼娘了（ok）'; }
+        speak('哎呀，戳我干嘛。');
+      }
+    },
+    onResume: function () { nativeLog('page onResume'); },
+    onPause: function () { nativeLog('page onPause'); }
+  };
+
+  // Browser-debug fallback (useful when opened on a laptop).
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { if (window.DshTv.onKey) window.DshTv.onKey(e.repeat ? 'long_ok' : 'ok'); }
+    if (e.key === 'Escape') window.DshTv.onKey('back');
+    if (e.key === 'ArrowUp') window.DshTv.onKey('up');
+    if (e.key === 'ArrowDown') window.DshTv.onKey('down');
+    if (e.key === 'ArrowLeft') window.DshTv.onKey('left');
+    if (e.key === 'ArrowRight') window.DshTv.onKey('right');
+  });
+
+  function boot() {
+    render('ok');
+    nativeLog('testpage booted, ready()');
+    try { if (window.DshTvNative && DshTvNative.ready) DshTvNative.ready(); } catch (e) {}
+  }
+  if (document.readyState === 'complete') boot();
+  else window.addEventListener('load', boot);
+})();
+</script>
+</body>
+</html>

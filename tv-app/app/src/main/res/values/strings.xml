@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DSH 办公室</string>
+    <string name="loading">正在连接 Mac 上的办公室…</string>
+    <string name="retry_hint">找不到 Mac 上的办公室，正在重试…</string>
+</resources>

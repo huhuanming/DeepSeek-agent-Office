@@ -1,0 +1,32 @@
+MIT License
+
+Copyright (c) 2026 huhuanming
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+第三方素材声明：
+
+- 鲸鱼娘动画素材来自 QCYTSN/dsh-dafeiyu（MIT），上游 PC2005-cloud/dsh-pet（MIT）。
+  本项目运行时不随仓库分发这些帧，而是读取本机 DS Harness 插件目录中的素材；
+  如需再分发，请保留上游版权与许可声明。
+- 灵感与参考：harishkotra/agent-office、Thunderunruly/agent-office、
+  pablodelucca/pixel-agents、thuyqpham/dsh-tv。
+- 本项目为个人/家庭自用原型，非 DeepSeek 官方产品，不使用 DeepSeek 官方 Logo。

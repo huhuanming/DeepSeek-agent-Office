@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# DSH Office TV — local Gradle launcher.
+#
+# This project intentionally avoids downloading a Gradle distribution: the machine
+# already has Gradle 9.x extracted under ~/.gradle/wrapper/dists.  This script is a
+# drop-in replacement for the standard `gradlew` (supports `assembleDebug`, etc.).
+#
+#   ./gradlew assembleDebug
+#   DSH_GRADLE_BIN=/path/to/gradle ./gradlew tasks
+#   DSH_GRADLE_USER_HOME=/tmp/foo ./gradlew assembleDebug
+#
+# Note: under the DSH file sandbox $HOME/.gradle may not be writable.  In that case
+# we transparently fall back to a Gradle home under /tmp.
+set -euo pipefail
+
+APP_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# ---- 1. Gradle user home -------------------------------------------------
+if [ -z "${GRADLE_USER_HOME:-}" ]; then
+  if [ -w "$HOME/.gradle" ] 2>/dev/null; then
+    export GRADLE_USER_HOME="$HOME/.gradle"
+  else
+    export GRADLE_USER_HOME="${DSH_GRADLE_USER_HOME:-/tmp/dsh-gradle-home}"
+  fi
+fi
+mkdir -p "$GRADLE_USER_HOME"
+
+# ---- 2. JDK 17 -----------------------------------------------------------
+if [ -z "${JAVA_HOME:-}" ] || [ ! -x "${JAVA_HOME:-}/bin/java" ]; then
+  if [ -x /opt/homebrew/opt/openjdk@17/bin/java ]; then
+    export JAVA_HOME=/opt/homebrew/opt/openjdk@17
+  elif [ -x "/Applications/Android Studio.app/Contents/jbr/Contents/Home/bin/java" ]; then
+    export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+  fi
+fi
+
+# ---- 3. Locate a Gradle 9.x distribution --------------------------------
+GRADLE_BIN="${DSH_GRADLE_BIN:-}"
+if [ -z "$GRADLE_BIN" ]; then
+  for ver in 9.0.0 9.4.1 8.13 8.9; do
+    for d in "$HOME/.gradle/wrapper/dists/gradle-${ver}-bin"/*/"gradle-${ver}"; do
+      if [ -x "$d/bin/gradle" ]; then
+        GRADLE_BIN="$d/bin/gradle"
+        break 2
+      fi
+    done
+  done
+fi
+if [ -z "$GRADLE_BIN" ]; then
+  GRADLE_BIN="$(command -v gradle || true)"
+fi
+if [ -z "$GRADLE_BIN" ] || [ ! -x "$GRADLE_BIN" ]; then
+  echo "ERROR: no Gradle executable found (looked in ~/.gradle/wrapper/dists and PATH)." >&2
+  exit 1
+fi
+
+exec "$GRADLE_BIN" --project-dir "$APP_HOME" "$@"
