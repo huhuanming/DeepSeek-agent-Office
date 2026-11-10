@@ -1606,6 +1606,7 @@
 
   let failStreak = 0;
   let initialKickDone = false;
+  let lastMicSeq = 0;
 
   function extractSessionsFromState(data) {
     if (!data) return [];
@@ -1704,6 +1705,7 @@
       waitingOverlay.classList.add('is-hidden');
       const extracted = extractSessionsFromState(data);
       applyStatePayload({ sessions: extracted.length > 0 ? extracted : MOCK_SESSIONS });
+      handlePhoneMic(data && data.mic);
     } catch (_) {
       failStreak++;
       liveDot.classList.add('off');
@@ -1738,6 +1740,22 @@
     document.body.classList.remove('panel-open');
     panelEl.classList.add('is-hidden');
     hintEl.classList.remove('is-hidden');
+  }
+
+  // 手机当麦克风：bridge 收到 /api/mic 后把文字塞进 /api/state.mic，这里轮询发现新 seq 就提问
+  function handlePhoneMic(mic) {
+    if (!mic || !mic.seq || !mic.text) return;
+    if (mic.seq === lastMicSeq) return;
+    lastMicSeq = mic.seq;
+    if (!panelOpen) openPanel();
+    showBubble('📱 手机说：「' + mic.text + '」', 4500);
+    askQuestion(mic.text);
+  }
+
+  // 面板底部提示：手机麦克风地址
+  const panelFootEl = document.querySelector('.panel-foot');
+  if (panelFootEl && !/\/mic/.test(panelFootEl.textContent)) {
+    panelFootEl.textContent = '手机当麦克风：' + location.origin + '/mic（手机浏览器打开，按住说话）';
   }
 
   async function askQuestion(qText) {

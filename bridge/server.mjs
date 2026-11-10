@@ -60,6 +60,12 @@ const MIME_TYPES = {
 
 const config = loadConfig()
 const tts = createTtsService(config.tts)
+
+// 手机当麦克风：手机上打开 /mic 说话，识别后的文字通过 POST /api/mic 送进来，
+// 电视页面轮询 /api/state 时看到新的 mic.seq 就当成一次提问。
+const MIC_MAX_CHARS = 120
+let micSeq = 0
+let micLatest = { seq: 0, text: '', ts: 0 }
 const stateReader = createStateReader(config)
 const assets = createAssetService(config)
 const chat = createChatService(config)
@@ -197,11 +203,11 @@ async function handleRequest(req, res) {
     try {
       const model = await stateReader.read()
       lastGoodModel = model
-      sendJson(req, res, 200, model)
+      sendJson(req, res, 200, { ...model, mic: micLatest })
     } catch (err) {
       console.error(`[http] /api/state 计算失败：${err.message}`)
       if (lastGoodModel) {
-        sendJson(req, res, 200, lastGoodModel)
+        sendJson(req, res, 200, { ...lastGoodModel, mic: micLatest })
       } else {
         sendJson(req, res, 500, { error: 'state_unavailable', message: '状态暂时读不到，稍后再试' })
       }
@@ -270,6 +276,24 @@ async function handleRequest(req, res) {
       console.warn(`[http] /api/tts 失败：${err.message}`)
       sendText(req, res, 503, 'tts_unavailable')
     }
+    return
+  }
+
+  // --- 手机麦克风：接收手机端识别出的文字 ---------------------------------
+  if (pathname === '/api/mic') {
+    if (method !== 'POST') return sendText(req, res, 405, '请用 POST 访问 /api/mic')
+    let parsed
+    try {
+      parsed = await parseJsonBody(req)
+    } catch {
+      return sendText(req, res, 500, '读取请求失败')
+    }
+    const raw = parsed && parsed.body ? parsed.body.text : ''
+    const text = typeof raw === 'string' ? raw.replace(/\s+/g, ' ').trim().slice(0, MIC_MAX_CHARS) : ''
+    if (!text) return sendText(req, res, 400, '缺少 text')
+    micLatest = { seq: ++micSeq, text, ts: Date.now() }
+    console.log(`[mic] 手机说：${text}`)
+    sendJson(req, res, 200, { ok: true, seq: micSeq })
     return
   }
 
@@ -349,7 +373,7 @@ async function handleRequest(req, res) {
   }
 
   // --- 静态文件（bridge/web/） --------------------------------------------
-  const relativePath = pathname === '/tv' ? 'index.html' : pathname.replace(/^\/+/u, '')
+  const relativePath = pathname === '/tv' ? 'index.html' : pathname === '/mic' ? 'mic.html' : pathname.replace(/^\/+/u, '')
   if (!relativePath || relativePath.includes('\0') || relativePath.split('/').includes('..')) {
     return friendlyNotFound(req, res)
   }
@@ -384,7 +408,7 @@ async function handleRequest(req, res) {
   const extension = path.extname(filePath).toLowerCase()
   const contentType = MIME_TYPES[extension] || 'application/octet-stream'
   const cacheControl =
-    extension === '.html' || extension === '.htm'
+    extension === '.html' || extension === '.htm' || extension === '.js' || extension === '.css'
       ? 'no-cache'
       : 'public, max-age=3600'
   res.writeHead(200, {

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<title>大肥鱼 · 手机麦克风</title>
+<style>
+  :root{
+    --navy:#0b1220; --navy2:#152241; --card:#101a33;
+    --cream:#f2e8d5; --gold:#f2b94b; --gold2:#d9a441;
+    --teal:#4aa3b8; --pink:#e88fa8;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{
+    background:radial-gradient(120% 80% at 50% 0%, #16244a 0%, var(--navy) 55%, #060a14 100%);
+    color:var(--cream);font-family:-apple-system,"PingFang SC","Noto Sans SC",sans-serif;
+    display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+    padding:28px 20px calc(28px + env(safe-area-inset-bottom));
+    min-height:100vh;min-height:100dvh;
+  }
+  .top{text-align:center;margin-top:6px}
+  .title{font-size:20px;letter-spacing:.08em;font-weight:700}
+  .title b{color:var(--gold)}
+  .sub{font-size:13px;color:#8ea7c4;margin-top:8px;line-height:1.6}
+  .status{font-size:12px;color:#6f89a8;margin-top:6px}
+  .status.ok{color:#7fd6a4}
+  .status.err{color:#e88f8f}
+  .mic-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;margin:18px 0}
+  .mic{
+    width:172px;height:172px;border-radius:50%;border:0;cursor:pointer;
+    background:radial-gradient(circle at 38% 32%, #ffe6ae 0%, var(--gold) 38%, var(--gold2) 72%, #8a5f1e 100%);
+    box-shadow:0 18px 50px rgba(242,185,75,.28), inset 0 -10px 24px rgba(0,0,0,.22);
+    color:#3a2607;font-size:46px;display:flex;align-items:center;justify-content:center;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .mic:active{transform:scale(.96)}
+  .mic.listening{
+    animation:pulse 1.1s ease-in-out infinite;
+    background:radial-gradient(circle at 38% 32%, #ffd0d8 0%, var(--pink) 45%, #b45a76 100%);
+    color:#4a1020;
+  }
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(232,143,168,.45),0 18px 50px rgba(0,0,0,.25)}50%{box-shadow:0 0 0 26px rgba(232,143,168,0),0 18px 50px rgba(0,0,0,.25)}}
+  .hint{font-size:13px;color:#9db3cd;text-align:center;line-height:1.6}
+  .hint b{color:var(--cream)}
+  .said{min-height:64px;width:100%;max-width:420px;background:rgba(16,26,51,.85);
+    border:1px solid #263a5e;border-radius:14px;padding:12px 14px;font-size:15px;line-height:1.6;color:#cfe0f2}
+  .said .who{color:var(--teal);font-size:12px;margin-right:6px}
+  .fallback{width:100%;max-width:420px;display:flex;gap:8px;margin-top:14px}
+  .fallback textarea{
+    flex:1;min-height:58px;resize:none;border-radius:12px;border:1px solid #263a5e;background:#0d1730;
+    color:var(--cream);font-size:15px;padding:10px 12px;font-family:inherit;
+  }
+  .fallback button{
+    width:84px;border:0;border-radius:12px;background:linear-gradient(180deg,#4aa3b8,#2d7d92);
+    color:#04121a;font-size:15px;font-weight:700;cursor:pointer;
+  }
+  .fallback button:active{transform:scale(.97)}
+  .tip{font-size:11px;color:#5d7592;text-align:center;line-height:1.6;margin-top:10px}
+  .tvurl{font-size:11px;color:#4f6784;word-break:break-all;text-align:center;margin-top:4px}
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="title">🐋 大肥鱼 · <b>手机麦克风</b></div>
+    <div class="sub">按住下面的圆钮说话，<br>电视上的鲸鱼娘就会回答你。</div>
+    <div class="status" id="status">正在连接电视…</div>
+  </div>
+
+  <div class="mic-wrap">
+    <button class="mic" id="micBtn" aria-label="按住说话">🎤</button>
+    <div class="hint" id="hint">按住 <b>🎤</b> 说一句话（松开结束）</div>
+  </div>
+
+  <div style="width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center">
+    <div class="said" id="said"><span class="who">电视回复</span><span id="saidText">等你说完…</span></div>
+
+    <div class="fallback">
+      <textarea id="txt" placeholder="也可以让输入法语音输入，或直接打字…"></textarea>
+      <button id="sendBtn">发送</button>
+    </div>
+    <div class="tip">小提示：如果按住没反应，点上面的输入框，用手机输入法的 🎤 说话，再点发送。</div>
+    <div class="tvurl" id="tvurl"></div>
+  </div>
+
+<script>
+(function(){
+  var micBtn = document.getElementById('micBtn');
+  var hint = document.getElementById('hint');
+  var statusEl = document.getElementById('status');
+  var saidText = document.getElementById('saidText');
+  var txt = document.getElementById('txt');
+  var sendBtn = document.getElementById('sendBtn');
+
+  var lastSeq = 0;
+  var recog = null;
+  var listening = false;
+
+  function setStatus(text, cls){ statusEl.textContent = text; statusEl.className = 'status' + (cls ? ' ' + cls : ''); }
+  function setSaid(text){ saidText.textContent = text; }
+
+  function baseUrl(){ return location.origin; }
+  document.getElementById('tvurl').textContent = '电视页面：' + location.origin + '/tv';
+
+  function health(){
+    fetch('/health', {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(){
+      setStatus('已连上电视服务 ✓', 'ok');
+    }).catch(function(){
+      setStatus('连不上电视服务，确认和 Mac 在同一个 Wi-Fi', 'err');
+    });
+  }
+  health();
+  setInterval(health, 15000);
+
+  function send(text){
+    text = String(text || '').trim();
+    if(!text) return;
+    setSaid('正在发给电视…');
+    fetch('/api/mic', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text:text})
+    }).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+      .then(function(){
+        setStatus('已发给电视 ✓  说下一句吧', 'ok');
+        hint.innerHTML = '已经发给电视啦，等鲸鱼娘回答～';
+        txt.value = '';
+      })
+      .catch(function(){ setStatus('发送失败，再试一次', 'err'); });
+  }
+
+  // 轮询电视上的回复（/api/state 里的 mic 目前只带问题；回复从 /api/chat 拿不到这里，
+  // 所以简单显示“已发送”，回复在电视上看/听）
+  // —— 如果你希望手机上也看到回复，下一步可以加一个 /api/last-reply。
+
+  var API = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (API) {
+    recog = new API();
+    recog.lang = 'zh-CN';
+    recog.continuous = false;
+    recog.interimResults = true;
+    recog.maxAlternatives = 1;
+    recog.onstart = function(){ listening = true; micBtn.classList.add('listening'); hint.textContent = '我在听… 松开结束'; };
+    recog.onresult = function(e){
+      var finalText = '';
+      var interim = '';
+      for (var i = e.resultIndex; i < e.results.length; i++) {
+        var r = e.results[i];
+        if (r.isFinal) finalText += r[0].transcript; else interim += r[0].transcript;
+      }
+      if (interim) hint.textContent = '听到：' + interim;
+      if (finalText) { send(finalText); }
+    };
+    recog.onerror = function(e){
+      listening = false; micBtn.classList.remove('listening');
+      if (e && e.error === 'not-allowed') setStatus('浏览器没给麦克风权限，用下面的输入框吧', 'err');
+      else if (e && e.error === 'no-speech') setStatus('没听到声音，再试一次～', 'err');
+      else setStatus('语音识别出错，用输入框吧', 'err');
+      hint.innerHTML = '按住 <b>🎤</b> 说一句话（松开结束）';
+    };
+    recog.onend = function(){ listening = false; micBtn.classList.remove('listening');
+      hint.innerHTML = '按住 <b>🎤</b> 说一句话（松开结束）'; };
+  } else {
+    setStatus('这个浏览器不支持直接语音识别，用输入法的 🎤 吧', 'err');
+  }
+
+  function startRecog(){
+    if (recog) { try { recog.start(); return true; } catch(_) {} }
+    txt.focus();
+    setStatus('按住输入框旁的 🎤（输入法语音）说一句吧');
+    return false;
+  }
+
+  // 按住说话（也兼容 click：点一下开始，说完自动结束）
+  micBtn.addEventListener('pointerdown', function(e){ e.preventDefault(); startRecog(); });
+  micBtn.addEventListener('click', function(e){ e.preventDefault(); if (!listening) startRecog(); });
+
+  sendBtn.addEventListener('click', function(){ send(txt.value); });
+  txt.addEventListener('keydown', function(e){ if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(txt.value); } });
+})();
+</script>
+</body>
+</html>
