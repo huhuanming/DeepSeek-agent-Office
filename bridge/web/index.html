@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
-<meta name="theme-color" content="#05070f">
+<meta name="theme-color" content="#070b14">
 <title>DSH 深夜办公室</title>
 <link rel="stylesheet" href="style.css">
 </head>
@@ -22,26 +22,52 @@
 
     <div id="hud-top">
       <div class="plaque">
-        <svg class="mark" viewBox="0 0 40 40" width="44" height="44" aria-hidden="true">
-          <path d="M4 23.4c4.6 2.6 8.6 2.6 12.4 0 3.6-2.4 5.6-5.6 9.4-6.6.9 3.4 3.2 5.6 6.6 6.6-1.5 2.9-4.1 4.4-6.9 4.4-1.5 0-2.9-.4-4-1.2-.6 3.8-3.8 6.6-7.8 6.6H7.6C5.1 33.2 3 31.1 3 28.6c0-1.9.7-3.6 1-5.2z" fill="#f2b94b"/>
-          <circle cx="10.4" cy="23.2" r="1.5" fill="#16244a"/>
-          <path d="M14.2 10.6c1.6 2.6 4.2 4 7 4.4-2 1.4-4 2-6.2 2" stroke="#f2b94b" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".75"/>
+        <svg class="mark" viewBox="0 0 16 16" width="44" height="44" shape-rendering="crispEdges" aria-hidden="true">
+          <rect x="1" y="1" width="14" height="14" fill="#152241"/>
+          <rect x="0" y="2" width="1" height="12" fill="#d9a441"/>
+          <rect x="15" y="2" width="1" height="12" fill="#d9a441"/>
+          <rect x="2" y="0" width="12" height="1" fill="#d9a441"/>
+          <rect x="2" y="15" width="12" height="1" fill="#d9a441"/>
+          <!-- Maid headband + water spout -->
+          <rect x="4" y="4" width="6" height="1" fill="#faf8f2"/>
+          <rect x="7" y="2" width="1" height="2" fill="#6fd0e0"/>
+          <rect x="5" y="2" width="1" height="1" fill="#a8eef5"/>
+          <rect x="9" y="2" width="1" height="1" fill="#a8eef5"/>
+          <!-- Chubby pixel whale body -->
+          <rect x="3" y="5" width="8" height="2" fill="#6fd0e0"/>
+          <rect x="2" y="7" width="10" height="3" fill="#4aa3b8"/>
+          <rect x="12" y="6" width="2" height="2" fill="#6fd0e0"/>
+          <rect x="13" y="5" width="1" height="1" fill="#6fd0e0"/>
+          <rect x="13" y="8" width="1" height="1" fill="#6fd0e0"/>
+          <!-- White belly & eye & blush -->
+          <rect x="3" y="10" width="7" height="2" fill="#faf8f2"/>
+          <rect x="4" y="7" width="2" height="2" fill="#070b14"/>
+          <rect x="4" y="7" width="1" height="1" fill="#faf8f2"/>
+          <rect x="3" y="9" width="1" height="1" fill="#e85d5d"/>
+          <!-- Waves -->
+          <rect x="2" y="13" width="3" height="1" fill="#284178"/>
+          <rect x="6" y="13" width="4" height="1" fill="#284178"/>
+          <rect x="11" y="13" width="3" height="1" fill="#284178"/>
         </svg>
         <div class="plaque-txt">
-          <div class="plaque-title">DSH 深夜办公室<span class="dotted">·</span><span class="live-dot" id="live-dot"></span><span id="live-text">上线中</span></div>
+          <div class="plaque-title"><span id="office-title">DSH 像素办公室</span><span class="dotted">·</span><span class="live-dot" id="live-dot"></span><span id="live-text">上线中</span></div>
           <div class="plaque-sub" id="plaque-sub">正在连接 Mac 上的办公室…</div>
         </div>
       </div>
       <div class="hud-right">
-        <div class="chip"><span class="ico-moon"></span><span id="clock">--:--</span></div>
+        <div class="chip">
+          <span class="ico-moon" id="ico-sky"></span>
+          <span id="sky-label" class="sky-label"></span>
+          <span id="clock">--:--</span>
+        </div>
       </div>
     </div>
 
     <div id="hint" class="hint">
       <span class="key">Ok</span><span class="hint-t">戳戳鲸鱼娘</span>
-      <span class="sep">·</span>
+      <span class="sep">▪</span>
       <span class="key key-wide">长按 Ok</span><span class="hint-t">聊聊天</span>
-      <span class="sep">·</span>
+      <span class="sep">▪</span>
       <span class="key">◀▶▲▼</span><span class="hint-t">看看大家在忙什么</span>
     </div>
 
@@ -66,26 +92,30 @@
 
     <div id="waiting" class="is-hidden">
       <div class="wait-card">
-        <svg class="wait-whale" viewBox="0 0 220 120" width="258" height="141" aria-hidden="true">
-          <path d="M52 62 L18 34 L28 62 L18 90 Z" fill="#2c3a6e"/>
-          <path d="M40 62 C 52 40 92 30 130 38 C 158 44 176 56 182 68 C 176 86 120 96 84 88 C 62 84 46 74 40 62 Z" fill="#2c3a6e"/>
-          <path d="M70 80 C 96 92 140 92 168 78 C 138 86 96 86 70 80 Z" fill="#3a4a86" opacity=".75"/>
-          <path d="M96 80 C 88 92 76 98 64 98 C 76 88 84 82 96 80 Z" fill="#2c3a6e"/>
-          <circle cx="152" cy="58" r="3.8" fill="#05070f"/>
-          <circle cx="153" cy="57" r="1.3" fill="#e9f2ff"/>
-          <path d="M120 30 C 122 18 130 10 142 8" stroke="#f2b94b" stroke-width="3" fill="none" stroke-linecap="round" opacity=".75"/>
-          <circle cx="150" cy="6" r="2" fill="#f7ecd2" opacity=".6"/>
-          <circle cx="190" cy="30" r="1.6" fill="#f7ecd2" opacity=".45"/>
-          <circle cx="24" cy="14" r="1.6" fill="#f7ecd2" opacity=".4"/>
-          <circle cx="104" cy="104" r="1.4" fill="#3fd0c9" opacity=".5"/>
-          <circle cx="76" cy="106" r="1.1" fill="#3fd0c9" opacity=".4"/>
+        <svg class="wait-whale" viewBox="0 0 32 18" width="256" height="144" shape-rendering="crispEdges" aria-hidden="true">
+          <rect x="10" y="4" width="9" height="1" fill="#faf8f2"/>
+          <rect x="9" y="5" width="12" height="2" fill="#6fd0e0"/>
+          <rect x="7" y="7" width="16" height="4" fill="#4aa3b8"/>
+          <rect x="8" y="11" width="14" height="2" fill="#284178"/>
+          <rect x="10" y="11" width="10" height="2" fill="#faf8f2"/>
+          <rect x="4" y="6" width="3" height="3" fill="#4aa3b8"/>
+          <rect x="2" y="4" width="2" height="2" fill="#6fd0e0"/>
+          <rect x="2" y="9" width="2" height="2" fill="#6fd0e0"/>
+          <rect x="19" y="8" width="2" height="2" fill="#070b14"/>
+          <rect x="20" y="8" width="1" height="1" fill="#faf8f2"/>
+          <rect x="18" y="10" width="1" height="1" fill="#e85d5d"/>
+          <rect x="15" y="1" width="1" height="2" fill="#6fd0e0"/>
+          <rect x="13" y="1" width="1" height="1" fill="#f2b94b"/>
+          <rect x="17" y="1" width="1" height="1" fill="#f2b94b"/>
+          <rect x="6" y="15" width="6" height="1" fill="#1e3160"/>
+          <rect x="14" y="15" width="8" height="1" fill="#1e3160"/>
         </svg>
         <div class="wait-title">等 Mac 上的办公室上线…</div>
         <div class="wait-sub"><span id="wait-dots">·</span> 每 2 秒自动重连，连上就自己开门</div>
       </div>
     </div>
 
-    <div id="boot">正在点亮办公室<span class="boot-dots"></span></div>
+    <div id="boot">正在点亮像素办公室<span class="boot-dots"></span></div>
   </div>
 </div>
 <script src="app.js"></script>
